@@ -103,6 +103,11 @@ func notifyEndpoint(ctx context.Context, ri *batchJobInfo, endpoint, token strin
 		return nil
 	}
 
+	// Validate webhook URL to prevent SSRF attacks
+	if err := validateWebhookURL(endpoint); err != nil {
+		return fmt.Errorf("invalid notification endpoint: %w", err)
+	}
+
 	buf, err := json.Marshal(ri)
 	if err != nil {
 		return err

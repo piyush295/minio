@@ -319,6 +319,11 @@ func (r BatchJobExpire) Notify(ctx context.Context, body io.Reader) error {
 		return nil
 	}
 
+	// Validate webhook URL to prevent SSRF attacks
+	if err := validateWebhookURL(r.NotificationCfg.Endpoint); err != nil {
+		return fmt.Errorf("invalid notification endpoint: %w", err)
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
